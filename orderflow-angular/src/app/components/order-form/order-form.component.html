@@ -1,0 +1,108 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal" role="dialog" [attr.aria-label]="isEdit ? 'Edit Order' : 'New Order'">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div>
+        <p class="modal-eyebrow">{{ isEdit ? 'Editing #' + order?.id : 'POST /api/orderdetails' }}</p>
+        <h2 class="modal-title">{{ isEdit ? 'Edit Order' : 'New Order' }}</h2>
+      </div>
+      <button class="close-btn" (click)="onClose()" aria-label="Close">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <form class="modal-body" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- Date of Purchase (full width) -->
+      <div class="form-group full">
+        <label for="dateOfPurchase">Date of Purchase *</label>
+        <input
+          id="dateOfPurchase"
+          type="datetime-local"
+          class="form-control"
+          [class.is-invalid]="isInvalid('dateOfPurchase')"
+          formControlName="dateOfPurchase"
+        >
+        <span class="field-error" *ngIf="isInvalid('dateOfPurchase')">
+          {{ getError('dateOfPurchase') }}
+        </span>
+      </div>
+
+      <div class="form-row">
+        <!-- Total -->
+        <div class="form-group">
+          <label for="total">Total Amount (₹) *</label>
+          <input
+            id="total"
+            type="number"
+            class="form-control"
+            [class.is-invalid]="isInvalid('total')"
+            formControlName="total"
+            placeholder="e.g. 1500.00"
+            step="0.01" min="0"
+          >
+          <span class="field-error" *ngIf="isInvalid('total')">{{ getError('total') }}</span>
+        </div>
+
+        <!-- Customer ID -->
+        <div class="form-group">
+          <label for="customerId">Customer ID *</label>
+          <input
+            id="customerId"
+            type="number"
+            class="form-control"
+            [class.is-invalid]="isInvalid('customerId')"
+            formControlName="customerId"
+            placeholder="e.g. 101"
+            min="1"
+          >
+          <span class="field-error" *ngIf="isInvalid('customerId')">{{ getError('customerId') }}</span>
+        </div>
+
+        <!-- Payment Mode -->
+        <div class="form-group">
+          <label for="paymentMode">Payment Mode *</label>
+          <select
+            id="paymentMode"
+            class="form-control"
+            [class.is-invalid]="isInvalid('paymentMode')"
+            formControlName="paymentMode"
+          >
+            <option value="">— Select Mode —</option>
+            <option *ngFor="let pm of paymentModes" [value]="pm">{{ pm }}</option>
+          </select>
+          <span class="field-error" *ngIf="isInvalid('paymentMode')">{{ getError('paymentMode') }}</span>
+        </div>
+
+        <!-- Shop ID -->
+        <div class="form-group">
+          <label for="shopId">Shop ID *</label>
+          <input
+            id="shopId"
+            type="text"
+            class="form-control"
+            [class.is-invalid]="isInvalid('shopId')"
+            formControlName="shopId"
+            placeholder="e.g. SHOP-001"
+          >
+          <span class="field-error" *ngIf="isInvalid('shopId')">{{ getError('shopId') }}</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" (click)="onClose()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="submitting">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+          {{ isEdit ? 'Update Order' : 'Create Order' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

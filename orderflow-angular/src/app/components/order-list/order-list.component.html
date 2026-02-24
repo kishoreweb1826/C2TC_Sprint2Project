@@ -1,0 +1,172 @@
+<div class="page-wrap">
+
+  <!-- Ambient blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <div class="page-title-wrap">
+      <p class="page-eyebrow">com.tnsif.orderdetails</p>
+      <h1 class="page-title">Order Details</h1>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
+      New Order
+    </button>
+  </div>
+
+  <!-- ── STATS ── -->
+  
+
+  <!-- ── TOOLBAR ── -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        class="form-control search-input"
+        type="search"
+        placeholder="Search by Shop ID, Customer ID, Payment Mode…"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+      >
+      <button *ngIf="searchQuery" class="clear-btn" (click)="clearSearch()">×</button>
+    </div>
+
+    <select class="form-control filter-select" [(ngModel)]="paymentFilter" (ngModelChange)="onFilter()">
+      <option value="">All Payment Modes</option>
+      <option *ngFor="let pm of paymentModes" [value]="pm">{{ pm }}</option>
+    </select>
+
+    <button class="btn btn-ghost" (click)="refresh()" [disabled]="loading">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+           [class.spinning]="loading">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  <!-- ── TABLE ── -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable" (click)="sortBy('id')">
+            ID <span class="sort-icon">{{ getSortIcon('id') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('dateOfPurchase')">
+            Date of Purchase <span class="sort-icon">{{ getSortIcon('dateOfPurchase') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('customerId')">
+            Customer ID <span class="sort-icon">{{ getSortIcon('customerId') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('shopId')">
+            Shop ID <span class="sort-icon">{{ getSortIcon('shopId') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('paymentMode')">
+            Payment Mode <span class="sort-icon">{{ getSortIcon('paymentMode') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('total')">
+            Total (₹) <span class="sort-icon">{{ getSortIcon('total') }}</span>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Loading skeletons -->
+        <ng-container *ngIf="loading">
+          <tr *ngFor="let i of [1,2,3,4,5]" class="skeleton-row">
+            <td><div class="skeleton" style="width:30px"></div></td>
+            <td><div class="skeleton" style="width:130px"></div></td>
+            <td><div class="skeleton" style="width:60px"></div></td>
+            <td><div class="skeleton" style="width:80px"></div></td>
+            <td><div class="skeleton" style="width:70px"></div></td>
+            <td><div class="skeleton" style="width:80px"></div></td>
+            <td><div class="skeleton" style="width:90px"></div></td>
+          </tr>
+        </ng-container>
+
+        <!-- Empty state -->
+        <tr *ngIf="!loading && filtered.length === 0">
+          <td colspan="7">
+            <div class="empty-state">
+              <div class="empty-icon">📋</div>
+              <h3>No Orders Found</h3>
+              <p>Adjust your search filters or create a new order.</p>
+              <button class="btn btn-primary" style="margin-top:16px" (click)="openCreate()">
+                Create First Order
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Data rows -->
+        <tr *ngFor="let order of paginated; trackBy: trackById">
+          <td class="td-id">#{{ order.id }}</td>
+          <td class="td-date">{{ formatDate(order.dateOfPurchase) }}</td>
+          <td class="td-mono">{{ order.customerId }}</td>
+          <td class="td-shop">{{ order.shopId }}</td>
+          <td><span [class]="getBadgeClass(order.paymentMode)">{{ order.paymentMode }}</span></td>
+          <td class="td-total">{{ formatCurrency(order.total) }}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn btn-ghost btn-icon" title="Edit order" (click)="openEdit(order)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <button class="btn btn-danger btn-icon" title="Delete order" (click)="openDelete(order)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 1 0 00-1-1m-4 0h4"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── PAGINATION ── -->
+  <div class="pagination" *ngIf="!loading && filtered.length > 0">
+    <span class="pag-info">
+      Showing {{ paginationStart }}–{{ paginationEnd }} of {{ filtered.length }} orders
+    </span>
+    <div class="pag-btns">
+      <button class="pag-btn" (click)="goPage(currentPage - 1)" [disabled]="currentPage === 1">←</button>
+      <button
+        *ngFor="let p of pageNumbers"
+        class="pag-btn"
+        [class.active]="p === currentPage"
+        (click)="goPage(p)"
+      >{{ p }}</button>
+      <button class="pag-btn" (click)="goPage(currentPage + 1)" [disabled]="currentPage === totalPages">→</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── ORDER FORM MODAL ── -->
+<app-order-form
+  *ngIf="showForm"
+  [order]="editOrder"
+  (save)="onFormSave($event)"
+  (close)="onFormClose()"
+/>
+
+<!-- ── CONFIRM DELETE MODAL ── -->
+<app-confirm-dialog
+  *ngIf="showConfirm"
+  [orderId]="deleteTarget?.id!"
+  (confirmed)="onConfirmDelete()"
+  (cancelled)="onCancelDelete()"
+/>

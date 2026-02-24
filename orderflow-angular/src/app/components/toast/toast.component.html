@@ -1,0 +1,15 @@
+<div class="toast-wrap">
+  <div
+    *ngFor="let toast of toasts"
+    class="toast"
+    [class.visible]="toast.visible"
+    [class.success]="toast.type === 'success'"
+    [class.error]="toast.type === 'error'"
+    [class.warning]="toast.type === 'warning'"
+    [class.info]="toast.type === 'info'"
+    (click)="dismiss(toast.id)"
+  >
+    <span class="toast-icon">{{ getIcon(toast.type) }}</span>
+    <span class="toast-msg">{{ toast.message }}</span>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 600;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid rgba(255,68,102,.2);
+  border-radius: 18px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,68,102,.1);
+  animation: slideUp .25s cubic-bezier(.22,.61,.36,1);
+  overflow: hidden;
+}
+@keyframes slideUp {
+  from { transform: translateY(24px) scale(.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-header {
+  padding: 24px 24px 0;
+  display: flex; align-items: center; gap: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+}
+
+.danger-icon {
+  width: 44px; height: 44px;
+  background: rgba(255,68,102,.12);
+  border: 1px solid rgba(255,68,102,.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--danger);
+}
+.danger-icon svg { width: 20px; height: 20px; }
+
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem; font-weight: 700;
+  color: var(--danger);
+}
+.modal-sub { font-size: .78rem; color: var(--text-muted); margin-top: 2px; }
+
+.modal-body { padding: 20px 24px; }
+.confirm-text { font-size: .9rem; color: var(--text-dim); line-height: 1.6; }
+.order-id {
+  font-family: 'DM Mono', monospace;
+  color: var(--accent); font-weight: 500;
+}
+
+.modal-footer {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 16px 24px 22px;
+  border-top: 1px solid var(--border);
+}
